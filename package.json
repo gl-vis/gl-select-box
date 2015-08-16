@@ -26,5 +26,8 @@
     "gl-buffer": "^2.1.2",
     "gl-shader": "^4.0.5",
     "glslify": "^2.2.1"
+  },
+  "browserify": {
+    "transform": [ "glslify" ]
   }
 }

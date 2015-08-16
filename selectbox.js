@@ -3,6 +3,8 @@
 var createShader = require('gl-shader')
 var createBuffer = require('gl-buffer')
 
+var SHADERS = require('./lib/shaders')
+
 module.exports = createSelectBox
 
 function SelectBox(plot, boxBuffer, boxShader) {
@@ -22,7 +24,10 @@ function SelectBox(plot, boxBuffer, boxShader) {
   ]
 
   this.borderColor = [0,0,0,1]
-  this.fillColor   = [0,0,0,0.25]
+  this.innerFill   = false
+  this.innerColor  = [0,0,0,0.25]
+  this.outerFill   = true
+  this.outerColor  = [0,0,0,0.5]
   this.borderWidth = 10
 }
 
@@ -34,12 +39,14 @@ proto.draw = function() {
   }
 
   var plot         = this.plot
-  var borderColor  = this.borderColor
-  var fillColor    = this.fillColor
   var selectBox    = this.selectBox
   var projectLines = this.projectLines
   var lineWidth    = this.borderWidth
-  var fillColor    = this.fillColor
+
+  var innerFill    = this.innerFill
+  var innerColor   = this.innerColor
+  var outerFill    = this.outerFill
+  var outerColor   = this.outerColor
   var borderColor  = this.borderColor
 
   var boxes        = plot.box
@@ -49,16 +56,36 @@ proto.draw = function() {
   var pixelRatio   = plot.pixelRatio
 
   //Map select box into pixel coordinates
-
-  boxes.bind()
-
-  //Draw box
   var loX = (selectBox[0]-dataBox[0])*(viewBox[2]-viewBox[0])/(dataBox[2]-dataBox[0])+viewBox[0]
   var loY = (selectBox[1]-dataBox[1])*(viewBox[3]-viewBox[1])/(dataBox[3]-dataBox[1])+viewBox[1]
   var hiX = (selectBox[2]-dataBox[0])*(viewBox[2]-viewBox[0])/(dataBox[2]-dataBox[0])+viewBox[0]
   var hiY = (selectBox[3]-dataBox[1])*(viewBox[3]-viewBox[1])/(dataBox[3]-dataBox[1])+viewBox[1]
 
-  boxes.drawBox(loX, loY, hiX, hiY, fillColor)
+  loX = Math.max(loX, viewBox[0])
+  loY = Math.max(loY, viewBox[1])
+  hiX = Math.min(hiX, viewBox[2])
+  hiY = Math.min(hiY, viewBox[3])
+
+  if(hiX < loX || hiY < loY) {
+    return
+  }
+
+  boxes.bind()
+
+  //Draw box
+  var screenWidth  = screenBox[2] - screenBox[0]
+  var screenHeight = screenBox[3] - screenBox[1]
+
+  if(this.outerFill) {
+    boxes.drawBox(0, 0, screenWidth, loY, outerColor)
+    boxes.drawBox(0, loY, loX, hiY, outerColor)
+    boxes.drawBox(0, hiY, screenWidth, screenHeight, outerColor)
+    boxes.drawBox(hiX, loY, screenWidth, hiY, outerColor)
+  }
+
+  if(this.innerFill) {
+    boxes.drawBox(loX, loY, hiX, hiY, innerColor)
+  }
 
   //Draw border
   if(lineWidth > 0) {
@@ -77,7 +104,10 @@ proto.draw = function() {
 proto.update = function(options) {
   options = options || {}
 
-  this.fillColor   = (options.fillColor   || [0,0,0,0.5]).slice()
+  this.innerFill    = !!options.innerFill
+  this.outerFill    = !!options.outerFill
+  this.innerColor   = (options.innerColor   || [0,0,0,0.5]).slice()
+  this.outerColor   = (options.outerColor   || [0,0,0,0.5]).slice()
   this.borderColor = (options.borderColor || [0,0,0,1]).slice()
   this.borderWidth = options.borderWidth || 0
   this.selectBox   = (options.selectBox || this.selectBox).slice()
