@@ -16,13 +16,6 @@ function SelectBox(plot, boxBuffer, boxShader) {
 
   this.selectBox = [Infinity,Infinity,-Infinity,-Infinity]
 
-  this.projectLines = [
-    false,
-    false,
-    false,
-    false
-  ]
-
   this.borderColor = [0,0,0,1]
   this.innerFill   = false
   this.innerColor  = [0,0,0,0.25]
@@ -40,7 +33,6 @@ proto.draw = function() {
 
   var plot         = this.plot
   var selectBox    = this.selectBox
-  var projectLines = this.projectLines
   var lineWidth    = this.borderWidth
 
   var innerFill    = this.innerFill
@@ -96,8 +88,6 @@ proto.draw = function() {
     boxes.drawBox(loX-w, hiY-w, hiX+w, hiY+w, borderColor)
     boxes.drawBox(loX-w, loY-w, loX+w, hiY+w, borderColor)
     boxes.drawBox(hiX-w, loY-w, hiX+w, hiY+w, borderColor)
-
-    //TODO: Draw projection lines
   }
 }
 
@@ -108,15 +98,15 @@ proto.update = function(options) {
   this.outerFill    = !!options.outerFill
   this.innerColor   = (options.innerColor   || [0,0,0,0.5]).slice()
   this.outerColor   = (options.outerColor   || [0,0,0,0.5]).slice()
-  this.borderColor = (options.borderColor || [0,0,0,1]).slice()
-  this.borderWidth = options.borderWidth || 0
-  this.selectBox   = (options.selectBox || this.selectBox).slice()
-  this.projectLines = (options.projectLines || [false, false, false, false]).slice()
+  this.borderColor  = (options.borderColor || [0,0,0,1]).slice()
+  this.borderWidth  = options.borderWidth || 0
+  this.selectBox    = (options.selectBox || this.selectBox).slice()
 }
 
 proto.dispose = function() {
   this.boxBuffer.dispose()
   this.boxShader.dispose()
+  this.plot.removeOverlay(this)
 }
 
 function createSelectBox(plot, options) {
@@ -129,5 +119,6 @@ function createSelectBox(plot, options) {
   var shader = createShader(gl, SHADERS.boxVertex, SHADERS.boxFragment)
   var selectBox = new SelectBox(plot, buffer, shader)
   selectBox.update(options)
+  plot.addOverlay(selectBox)
   return selectBox
 }
