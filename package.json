@@ -1,6 +1,6 @@
 {
   "name": "gl-select-box",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Draws a user selection over the screen",
   "main": "selectbox.js",
   "scripts": {
@@ -28,6 +28,8 @@
     "glslify": "^2.2.1"
   },
   "browserify": {
-    "transform": [ "glslify" ]
+    "transform": [
+      "glslify"
+    ]
   }
 }
