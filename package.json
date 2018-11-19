@@ -25,7 +25,7 @@
   "dependencies": {
     "gl-buffer": "^2.1.2",
     "gl-shader": "^4.0.5",
-    "glslify": "^6.1.0"
+    "glslify": "^6.3.1"
   },
   "browserify": {
     "transform": [
