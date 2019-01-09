@@ -4,6 +4,7 @@
   "description": "Draws a user selection over the screen",
   "main": "selectbox.js",
   "scripts": {
+    "postshrinkwrap": "chttps .",
     "test": "tape test/*.js"
   },
   "repository": {
@@ -25,11 +26,14 @@
   "dependencies": {
     "gl-buffer": "^2.1.2",
     "gl-shader": "^4.0.5",
-    "glslify": "^6.1.0"
+    "glslify": "^7.0.0"
   },
   "browserify": {
     "transform": [
       "glslify"
     ]
+  },
+  "devDependencies": {
+    "chttps": "^1.0.6"
   }
 }
